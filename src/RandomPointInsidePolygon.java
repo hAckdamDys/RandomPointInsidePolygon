@@ -17,7 +17,7 @@ public class RandomPointInsidePolygon {
         for (int i = 0; i < 10000; i++) {
             Point generatedPoint = rPG.generatePoint();
             float genColor = (float) rPG.flattenDistanceFromMiddle(generatedPoint);
-            polygonPointDrawer.addPoint(generatedPoint,Color.getHSBColor(4f*(1-genColor)%1f,0.8f*(1-genColor),0.8f*(1-genColor)));
+            polygonPointDrawer.addPoint(generatedPoint,Color.getHSBColor(16f*(2-0.9f*genColor)%1f,(1-genColor),1-0.2f*(1-genColor)));
         }
         polygonPointDrawer.show();
     }
