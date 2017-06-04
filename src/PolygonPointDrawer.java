@@ -4,6 +4,7 @@ import org.dyn4j.geometry.Vector2;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class PolygonPointDrawer {
     private List<Polygon> polygons = new LinkedList<>();
     private List<Polygon> triPolygons = new LinkedList<>();
     private List<Point> points = new LinkedList<>();
+    private List<Color> pointColors = new LinkedList<>();
 
     public void addPolygon(Polygon p) {
         this.polygons.add(p);
@@ -31,7 +33,12 @@ public class PolygonPointDrawer {
     }
 
     public void addPoint(Point p) {
+        addPoint(p, Color.RED);
+    }
+
+    public void addPoint(Point p, Color c) {
         this.points.add(p);
+        this.pointColors.add(c);
     }
 
     public void show() {
@@ -39,17 +46,21 @@ public class PolygonPointDrawer {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.setColor(Color.BLUE);
+                setBackground(Color.black);
+                g.setColor(Color.WHITE);
                 for (Polygon p : polygons) {
                     g.fillPolygon(p);
                 }
-                g.setColor(Color.GREEN);
+                Graphics2D g2=(Graphics2D)g;
+                g2.setStroke(new BasicStroke(2));
+                g.setColor(Color.RED);
                 for (Polygon p : triPolygons) {
                     g.drawPolygon(p);
                 }
-                g.setColor(Color.RED);
+                Iterator<Color> colorIterator = pointColors.iterator();
                 for (Point p : points) {
-                    g.fillOval((int) p.getX() - 5, (int) p.getY() - 5, 10, 10);
+                    g.setColor(colorIterator.next());
+                    g.fillOval((int) p.getX() - 3, (int) p.getY() - 3, 6, 6);
                 }
             }
 

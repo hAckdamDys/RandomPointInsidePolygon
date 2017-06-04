@@ -2,9 +2,10 @@ import org.dyn4j.geometry.Triangle;
 import org.dyn4j.geometry.Vector2;
 import org.dyn4j.geometry.decompose.EarClipping;
 
-import java.awt.Polygon;
-import java.awt.Point;
-import java.util.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Adm on 2017-06-03.
@@ -13,14 +14,19 @@ import java.util.*;
 public class PolygonRandomPointGenerator {
     private boolean isInitialized = false;
     private TrianglePointGenerator[] trianglePointGenerators;
+    private List<Triangle> triangles;
     private double fullArea = 0;
     private Random random = new Random(System.currentTimeMillis());
+    private Point middlePoint=null;
+    private Polygon polygon;
+    private double futherestDistance = 0;
 
     public PolygonRandomPointGenerator(Polygon polygon) {
-        this.init(polygon);
+        this.polygon=polygon;
+        this.init();
     }
 
-    private void init(Polygon polygon) {
+    private void init() {
         if (isInitialized) return;
         //triangulate
         ArrayList<Vector2> vectors = new ArrayList<>();
@@ -29,6 +35,7 @@ public class PolygonRandomPointGenerator {
         }
         EarClipping clipping = new EarClipping();
         List<Triangle> triangles = clipping.triangulate(vectors.toArray(new Vector2[vectors.size()]));
+        this.triangles=triangles;
         //first get full area of all triangles to decide percentage each triangle takes in polygon
         ArrayList<TrianglePointGenerator> trianglePointGenerators = new ArrayList<>();
         for (Triangle triangle : triangles) {
@@ -50,10 +57,6 @@ public class PolygonRandomPointGenerator {
     }
 
     public List<Triangle> getTriangles() {
-        List<Triangle> triangles = new LinkedList<>();
-        for (TrianglePointGenerator trianglePointGenerator : trianglePointGenerators) {
-            triangles.add(trianglePointGenerator.getTriangle());
-        }
         return triangles;
     }
 
@@ -87,4 +90,51 @@ public class PolygonRandomPointGenerator {
         return this.generateTriangleGenerator().generatePoint();
     }
 
+    public Point getMiddlePoint(){
+        if(middlePoint==null) {
+            //average points value:
+//            double xAvg = 0;
+//            double yAvg = 0;
+//            for (int i = 0; i < polygon.npoints; i++) {
+//                xAvg += polygon.xpoints[i];
+//                yAvg += polygon.ypoints[i];
+//            }
+//            xAvg/=polygon.npoints;
+//            yAvg/=polygon.npoints;
+//            middlePoint = new Point((int)xAvg,(int)yAvg);
+
+            //midlle Area Point
+            double xAvg = 0;
+            double yAvg = 0;
+            for (TrianglePointGenerator tPG:trianglePointGenerators) {
+                double curArea = tPG.getArea();
+                Vector2 center = tPG.getTriangle().getCenter();
+                xAvg+=(center.x*curArea);
+                yAvg+=(center.y*curArea);
+            }
+            xAvg/=fullArea;
+            yAvg/=fullArea;
+            middlePoint = new Point((int)xAvg,(int)yAvg);
+        }
+        return middlePoint;
+    }
+
+    public double getFurtherestDistance(){
+        if(futherestDistance == 0){
+            Point middlePoint = this.getMiddlePoint();
+            for (int i = 0; i < polygon.npoints; i++) {
+                double curDistance = middlePoint.distance(polygon.xpoints[i],polygon.ypoints[i]);
+                if(curDistance>futherestDistance){
+                    futherestDistance=curDistance;
+                }
+            }
+        }
+        return futherestDistance;
+    }
+
+    public double flattenDistanceFromMiddle(Point point){
+        Point middlePoint = this.getMiddlePoint();//so it initialize if not initialized yet
+        double furtherestDistance = this.getFurtherestDistance();
+        return middlePoint.distance(point)/futherestDistance;
+    }
 }
