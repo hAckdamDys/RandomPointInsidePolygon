@@ -20,11 +20,11 @@ public class PolygonPointDrawer {
         this.polygons.add(p);
     }
 
-    public void addTriangles(Collection<Triangle> triangles){
-        for (Triangle triangle:triangles) {
+    public void addTriangles(Collection<Triangle> triangles) {
+        for (Triangle triangle : triangles) {
             Polygon triPol = new Polygon();
-            for (Vector2 v:triangle.getVertices()) {
-                triPol.addPoint((int)v.x,(int)v.y);
+            for (Vector2 v : triangle.getVertices()) {
+                triPol.addPoint((int) v.x, (int) v.y);
             }
             this.triPolygons.add(triPol);
         }
@@ -49,7 +49,7 @@ public class PolygonPointDrawer {
                 }
                 g.setColor(Color.RED);
                 for (Point p : points) {
-                    g.fillOval((int) p.getX()-5, (int) p.getY()-5, 10, 10);
+                    g.fillOval((int) p.getX() - 5, (int) p.getY() - 5, 10, 10);
                 }
             }
 

@@ -11,56 +11,57 @@ import java.util.*;
  */
 
 public class PolygonRandomPointGenerator {
-    private boolean isInitialized=false;
+    private boolean isInitialized = false;
     private TrianglePointGenerator[] trianglePointGenerators;
-    private double fullArea=0;
+    private double fullArea = 0;
     private Random random = new Random(System.currentTimeMillis());
+
     public PolygonRandomPointGenerator(Polygon polygon) {
         this.init(polygon);
     }
 
-    private void init(Polygon polygon){
-        if(isInitialized) return;
+    private void init(Polygon polygon) {
+        if (isInitialized) return;
         //triangulate
-        ArrayList<Vector2> vectors=new ArrayList<>();
+        ArrayList<Vector2> vectors = new ArrayList<>();
         for (int i = 0; i < polygon.npoints; i++) {
-            vectors.add(new Vector2(polygon.xpoints[i],polygon.ypoints[i]));
+            vectors.add(new Vector2(polygon.xpoints[i], polygon.ypoints[i]));
         }
         EarClipping clipping = new EarClipping();
         List<Triangle> triangles = clipping.triangulate(vectors.toArray(new Vector2[vectors.size()]));
         //first get full area of all triangles to decide percentage each triangle takes in polygon
-        ArrayList<TrianglePointGenerator> trianglePointGenerators=new ArrayList<>();
-        for (Triangle triangle:triangles) {
-            TrianglePointGenerator trianglePointGenerator= new TrianglePointGenerator(triangle);
-            fullArea+=trianglePointGenerator.getArea();
+        ArrayList<TrianglePointGenerator> trianglePointGenerators = new ArrayList<>();
+        for (Triangle triangle : triangles) {
+            TrianglePointGenerator trianglePointGenerator = new TrianglePointGenerator(triangle);
+            fullArea += trianglePointGenerator.getArea();
             trianglePointGenerators.add(trianglePointGenerator);
         }
         //now setup startValues and endValues so we can binary seach on triangles
-        double currentArea=0;
-        for (TrianglePointGenerator trianglePointGenerator:trianglePointGenerators) {
-            trianglePointGenerator.setStartValue(currentArea/fullArea);
-            currentArea+=trianglePointGenerator.getArea();
-            trianglePointGenerator.setEndValue(currentArea/fullArea);
+        double currentArea = 0;
+        for (TrianglePointGenerator trianglePointGenerator : trianglePointGenerators) {
+            trianglePointGenerator.setStartValue(currentArea / fullArea);
+            currentArea += trianglePointGenerator.getArea();
+            trianglePointGenerator.setEndValue(currentArea / fullArea);
         }
-        this.trianglePointGenerators=trianglePointGenerators.toArray(
+        this.trianglePointGenerators = trianglePointGenerators.toArray(
                 new TrianglePointGenerator[trianglePointGenerators.size()]
         );
-        isInitialized=true;
+        isInitialized = true;
     }
 
-    public List<Triangle> getTriangles(){
+    public List<Triangle> getTriangles() {
         List<Triangle> triangles = new LinkedList<>();
-        for (TrianglePointGenerator trianglePointGenerator:trianglePointGenerators) {
+        for (TrianglePointGenerator trianglePointGenerator : trianglePointGenerators) {
             triangles.add(trianglePointGenerator.getTriangle());
         }
         return triangles;
     }
 
-    public TrianglePointGenerator[] getTrianglePointGenerators(){
+    public TrianglePointGenerator[] getTrianglePointGenerators() {
         return trianglePointGenerators;
     }
 
-    public TrianglePointGenerator generateTriangleGenerator(){
+    public TrianglePointGenerator generateTriangleGenerator() {
 
         double r = random.nextDouble();
         int lo = 0;
@@ -69,10 +70,10 @@ public class PolygonRandomPointGenerator {
             // Key is in a[lo..hi] or not present.
             int mid = lo + (hi - lo) / 2;
 
-            double currentLo=trianglePointGenerators[mid].getStartValue();
-            double currentHi=trianglePointGenerators[mid].getEndValue();
+            double currentLo = trianglePointGenerators[mid].getStartValue();
+            double currentHi = trianglePointGenerators[mid].getEndValue();
 
-            if      (r <= currentLo) hi = mid - 1;
+            if (r <= currentLo) hi = mid - 1;
             else if (r > currentHi) lo = mid + 1;
             else {
                 return trianglePointGenerators[mid];
@@ -82,7 +83,7 @@ public class PolygonRandomPointGenerator {
         return null;
     }
 
-    public Point generatePoint(){
+    public Point generatePoint() {
         return this.generateTriangleGenerator().generatePoint();
     }
 
