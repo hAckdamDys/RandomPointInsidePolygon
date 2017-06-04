@@ -13,6 +13,7 @@ public class TrianglePointGenerator {
     private double startValue;
     private double endValue;
     private Vector2 a,b,c;
+    private Random random = new Random(System.currentTimeMillis());
     public TrianglePointGenerator(Triangle triangle){
         this.triangle=triangle;
         Vector2[] vectors = triangle.getVertices();
@@ -42,13 +43,13 @@ public class TrianglePointGenerator {
     public double getArea(){
         return area;
     }
+
+
     public Point generatePoint(){
-        Random random = new Random(System.currentTimeMillis());
         double r1 = Math.sqrt(random.nextDouble());
         double r2 = random.nextDouble();
         Vector2 tmpA=this.a.copy(),tmpB=this.b.copy(),tmpC=this.c.copy();
         Vector2 resultVec = tmpA.multiply(1-r1).add(tmpB.multiply(r1*(1-r2))).add(tmpC.multiply(r2*r1));
-        Point resultPoint = new Point((int)resultVec.x,(int)resultVec.y);
-        return resultPoint;
+        return new Point((int)resultVec.x,(int)resultVec.y);
     }
 }

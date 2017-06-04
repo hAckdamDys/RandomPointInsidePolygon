@@ -14,7 +14,7 @@ public class PolygonRandomPointGenerator {
     private boolean isInitialized=false;
     private TrianglePointGenerator[] trianglePointGenerators;
     private double fullArea=0;
-
+    private Random random = new Random(System.currentTimeMillis());
     public PolygonRandomPointGenerator(Polygon polygon) {
         this.init(polygon);
     }
@@ -49,7 +49,7 @@ public class PolygonRandomPointGenerator {
     }
 
     public List<Triangle> getTriangles(){
-        List<Triangle> triangles = new LinkedList<Triangle>();
+        List<Triangle> triangles = new LinkedList<>();
         for (TrianglePointGenerator trianglePointGenerator:trianglePointGenerators) {
             triangles.add(trianglePointGenerator.getTriangle());
         }
@@ -61,7 +61,7 @@ public class PolygonRandomPointGenerator {
     }
 
     public TrianglePointGenerator generateTriangleGenerator(){
-        Random random = new Random(System.currentTimeMillis());
+
         double r = random.nextDouble();
         int lo = 0;
         int hi = trianglePointGenerators.length - 1;

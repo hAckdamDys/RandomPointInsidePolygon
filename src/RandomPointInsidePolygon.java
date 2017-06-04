@@ -14,7 +14,10 @@ public class RandomPointInsidePolygon {
 
         polygonPointDrawer.addPolygon(polygon);
         polygonPointDrawer.addTriangles(rPG.getTriangles());
-        polygonPointDrawer.addPoint(rPG.generatePoint());
+        for (int i = 0; i < 1000; i++) {
+            polygonPointDrawer.addPoint(rPG.generatePoint());
+        }
+
         polygonPointDrawer.show();
     }
 }
